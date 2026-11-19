@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Violation History{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Violation History</h1>
+
+<div class="card">
+    <h3>Search and Filter</h3>
+    <form method="GET" action="/history">
+        <div class="filter-bar">
+            <div class="form-group">
+                <label for="q">Vehicle Number</label>
+                <input type="text" id="q" name="q" value="{{ filters.q }}"
+                       placeholder="Search vehicle number">
+            </div>
+
+            <div class="form-group">
+                <label for="status">Payment Status</label>
+                <select id="status" name="status">
+                    <option value="">All</option>
+                    <option value="Unpaid" {% if filters.status == 'Unpaid' %}selected{% endif %}>Unpaid</option>
+                    <option value="Paid" {% if filters.status == 'Paid' %}selected{% endif %}>Paid</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="type_id">Violation Type</label>
+                <select id="type_id" name="type_id">
+                    <option value="">All</option>
+                    {% for t in types %}
+                    <option value="{{ t.type_id }}"
+                        {% if filters.type_id == t.type_id|string %}selected{% endif %}>
+                        {{ t.violation_name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="date_from">From Date</label>
+                <input type="date" id="date_from" name="date_from" value="{{ filters.date_from }}">
+            </div>
+
+            <div class="form-group">
+                <label for="date_to">To Date</label>
+                <input type="date" id="date_to" name="date_to" value="{{ filters.date_to }}">
+            </div>
+        </div>
+
+        <div class="mt-10">
+            <button type="submit" class="btn">Search</button>
+            <a href="/history" class="btn btn-grey">Clear</a>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <h3>{{ violations|length }} record(s) found</h3>
+    <div class="table-wrap">
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Vehicle No.</th>
+                <th>Owner</th>
+                <th>Violation</th>
+                <th>Location</th>
+                <th>Date</th>
+                <th>Fine (₹)</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+            {% for v in violations %}
+            <tr>
+                <td>{{ v.violation_id }}</td>
+                <td><a href="/vehicle/{{ v.vehicle_id }}">{{ v.vehicle_number }}</a></td>
+                <td>{{ v.owner_name }}</td>
+                <td>{{ v.violation_name }}</td>
+                <td>{{ v.location }}</td>
+                <td>{{ v.violation_date }}</td>
+                <td>{{ "%.2f"|format(v.fine_amount) }}</td>
+                <td>
+                    {% if v.payment_status == 'Paid' %}
+                        <span class="badge badge-paid">Paid</span>
+                        <br><small>{{ v.paid_on }}</small>
+                    {% else %}
+                        <span class="badge badge-unpaid">Unpaid</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="/challan/{{ v.violation_id }}" class="btn btn-small btn-grey">Challan</a>
+                    {% if v.payment_status == 'Unpaid' %}
+                    <form method="POST" action="/mark-paid/{{ v.violation_id }}"
+                          style="display:inline;"
+                          onsubmit="return confirm('Mark this fine as paid?');">
+                        <button type="submit" class="btn btn-small btn-green">Mark Paid</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="9">No records found.</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Monthly Reports{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Monthly Traffic Report</h1>
+
+<div class="card">
+    <form method="GET" action="/reports">
+        <div class="filter-bar">
+            <div class="form-group">
+                <label for="month">Select Month</label>
+                <input type="month" id="month" name="month" value="{{ month }}" required>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn">Show Report</button>
+                <a href="/export-excel?month={{ month }}" class="btn btn-green">Download Excel Report</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card stat-blue">
+        <h3>Violations in {{ month }}</h3>
+        <div class="number">{{ summary.total }}</div>
+    </div>
+    <div class="stat-card stat-orange">
+        <h3>Total Fine Amount</h3>
+        <div class="number">₹ {{ "%.2f"|format(summary.total_fine) }}</div>
+    </div>
+    <div class="stat-card stat-green">
+        <h3>Collected</h3>
+        <div class="number">₹ {{ "%.2f"|format(summary.paid_amount) }}</div>
+    </div>
+    <div class="stat-card stat-red">
+        <h3>Pending</h3>
+        <div class="number">₹ {{ "%.2f"|format(summary.unpaid_amount) }}</div>
+    </div>
+</div>
+
+<div class="card">
+    <h3>Violations by Type</h3>
+    <div class="table-wrap">
+        <table>
+            <tr>
+                <th>Violation</th>
+                <th>Total</th>
+            </tr>
+            {% for t in type_stats %}
+            <tr>
+                <td>{{ t.violation_name }}</td>
+                <td>{{ t.total }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="2">No data for this month.</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
+<div class="card">
+    <h3>Repeat Offenders (3 or more violations)</h3>
+    <div class="table-wrap">
+        <table>
+            <tr>
+                <th>Vehicle No.</th>
+                <th>Owner</th>
+                <th>Total Violations</th>
+            </tr>
+            {% for r in repeat_offenders %}
+            <tr>
+                <td><a href="/vehicle/{{ r.vehicle_id }}">{{ r.vehicle_number }}</a></td>
+                <td>{{ r.owner_name }}</td>
+                <td><span class="badge badge-repeat">{{ r.total }}</span></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="3">No repeat offenders.</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
+<div class="card">
+    <h3>All Violations in {{ month }}</h3>
+    <div class="table-wrap">
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Vehicle No.</th>
+                <th>Violation</th>
+                <th>Location</th>
+                <th>Date</th>
+                <th>Fine (₹)</th>
+                <th>Status</th>
+            </tr>
+            {% for v in report_rows %}
+            <tr>
+                <td>{{ v.violation_id }}</td>
+                <td>{{ v.vehicle_number }}</td>
+                <td>{{ v.violation_name }}</td>
+                <td>{{ v.location }}</td>
+                <td>{{ v.violation_date }}</td>
+                <td>{{ "%.2f"|format(v.fine_amount) }}</td>
+                <td>
+                    {% if v.payment_status == 'Paid' %}
+                        <span class="badge badge-paid">Paid</span>
+                    {% else %}
+                        <span class="badge badge-unpaid">Unpaid</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="7">No violations in this month.</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Add Violation{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Add Traffic Violation</h1>
+
+<div class="card">
+    <h3>Violation Details</h3>
+
+    <form method="POST" action="/add-violation">
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="vehicle_number">Vehicle Number *</label>
+                <input type="text" id="vehicle_number" name="vehicle_number"
+                       list="vehicle_list" placeholder="Start typing the number" required>
+                <datalist id="vehicle_list">
+                    {% for v in vehicles %}
+                    <option value="{{ v.vehicle_number }}">{{ v.owner_name }}</option>
+                    {% endfor %}
+                </datalist>
+            </div>
+
+            <div class="form-group">
+                <label for="type_id">Violation Type *</label>
+                <select id="type_id" name="type_id" required>
+                    <option value="">-- Select violation --</option>
+                    {% for t in types %}
+                    <option value="{{ t.type_id }}">
+                        {{ t.violation_name }} - ₹{{ "%.0f"|format(t.fine_amount) }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="location">Location *</label>
+                <input type="text" id="location" name="location"
+                       placeholder="Example: Big Bazaar, Trichy" maxlength="150" required>
+            </div>
+
+            <div class="form-group">
+                <label for="violation_date">Violation Date *</label>
+                <input type="date" id="violation_date" name="violation_date"
+                       value="{{ today }}" max="{{ today }}" required>
+            </div>
+        </div>
+
+        <p class="alert alert-info">
+            The fine amount is added automatically from the selected violation type.
+            Every new violation starts as <strong>Unpaid</strong>.
+        </p>
+
+        <button type="submit" class="btn btn-green">Save Violation and Generate Challan</button>
+        <a href="/dashboard" class="btn btn-grey">Cancel</a>
+    </form>
+</div>
+{% endblock %}

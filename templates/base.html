@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Smart Traffic Violation System{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="{% block body_class %}{% endblock %}">
+
+{% block navbar %}
+<nav class="navbar">
+    <div class="nav-brand">Smart Traffic Violation System</div>
+    <ul class="nav-links">
+        <li><a href="/dashboard">Dashboard</a></li>
+        <li><a href="/register-vehicle">Register Vehicle</a></li>
+        <li><a href="/add-violation">Add Violation</a></li>
+        <li><a href="/history">History</a></li>
+        <li><a href="/reports">Reports</a></li>
+        <li><a href="/logout" class="logout">Logout</a></li>
+    </ul>
+</nav>
+{% endblock %}
+
+<main class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+</main>
+
+</body>
+</html>

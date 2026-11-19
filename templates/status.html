@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Challan Status{% endblock %}
+
+{% block navbar %}
+<div class="public-header">Smart Traffic Violation System</div>
+{% endblock %}
+
+{% block content %}
+<div class="challan-box">
+    <h2>Challan Status</h2>
+
+    <div class="status-big">
+        {% if v.payment_status == 'Paid' %}
+            <span class="badge badge-paid">PAID</span>
+        {% else %}
+            <span class="badge badge-unpaid">UNPAID</span>
+        {% endif %}
+    </div>
+
+    <div class="challan-row"><span>Challan No.</span><span>CH-{{ "%05d"|format(v.violation_id) }}</span></div>
+    <div class="challan-row"><span>Vehicle Number</span><span>{{ v.vehicle_number }}</span></div>
+    <div class="challan-row"><span>Violation</span><span>{{ v.violation_name }}</span></div>
+    <div class="challan-row"><span>Location</span><span>{{ v.location }}</span></div>
+    <div class="challan-row"><span>Date</span><span>{{ v.violation_date }}</span></div>
+    <div class="challan-row"><span>Fine Amount</span><span>₹ {{ "%.2f"|format(v.fine_amount) }}</span></div>
+
+    {% if v.payment_status == 'Paid' %}
+    <div class="challan-row"><span>Paid On</span><span>{{ v.paid_on }}</span></div>
+    {% endif %}
+</div>
+{% endblock %}

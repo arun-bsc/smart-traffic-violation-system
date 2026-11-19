@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Challan{% endblock %}
+
+{% block content %}
+<div class="challan-box">
+    <h2>TRAFFIC E-CHALLAN</h2>
+
+    <div class="challan-row"><span>Challan No.</span><span>CH-{{ "%05d"|format(v.violation_id) }}</span></div>
+    <div class="challan-row"><span>Vehicle Number</span><span>{{ v.vehicle_number }}</span></div>
+    <div class="challan-row"><span>Vehicle Type</span><span>{{ v.vehicle_type }}</span></div>
+    <div class="challan-row"><span>Owner Name</span><span>{{ v.owner_name }}</span></div>
+    <div class="challan-row"><span>Violation</span><span>{{ v.violation_name }}</span></div>
+    <div class="challan-row"><span>Location</span><span>{{ v.location }}</span></div>
+    <div class="challan-row"><span>Date</span><span>{{ v.violation_date }}</span></div>
+    <div class="challan-row"><span>Fine Amount</span><span>₹ {{ "%.2f"|format(v.fine_amount) }}</span></div>
+    <div class="challan-row">
+        <span>Payment Status</span>
+        <span>
+            {% if v.payment_status == 'Paid' %}
+                <span class="badge badge-paid">Paid</span>
+            {% else %}
+                <span class="badge badge-unpaid">Unpaid</span>
+            {% endif %}
+        </span>
+    </div>
+    <div class="challan-row"><span>Recorded By</span><span>{{ v.officer_name }}</span></div>
+
+    <div class="qr-box">
+        <img src="{{ url_for('static', filename='qrcodes/' + qr_file) }}" alt="QR Code">
+        <p>Scan to view violation details and payment status</p>
+    </div>
+</div>
+
+<div class="text-center mt-10 no-print">
+    <button onclick="window.print()" class="btn">Print Challan</button>
+    <a href="/history" class="btn btn-grey">Back to History</a>
+</div>
+{% endblock %}

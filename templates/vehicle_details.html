@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Vehicle Details{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Vehicle Details: {{ vehicle.vehicle_number }}</h1>
+{% if is_repeat %}
+<div class="alert alert-warning">
+    <strong>Repeat Offender:</strong>
+    This vehicle has {{ total }} violations recorded.
+</div>
+{% endif %}
+
+<div class="card">
+    <h3>Vehicle and Owner Information</h3>
+    <div class="info-grid">
+        <div class="info-item"><span>Vehicle Number</span><strong>{{ vehicle.vehicle_number }}</strong></div>
+        <div class="info-item"><span>Vehicle Type</span><strong>{{ vehicle.vehicle_type }}</strong></div>
+        <div class="info-item"><span>Owner Name</span><strong>{{ vehicle.owner_name }}</strong></div>
+        <div class="info-item"><span>Owner Phone</span><strong>{{ vehicle.owner_phone or "-" }}</strong></div>
+        <div class="info-item"><span>Address</span><strong>{{ vehicle.owner_address or "-" }}</strong></div>
+        <div class="info-item"><span>Total Violations</span><strong>{{ total }}</strong></div>
+        <div class="info-item"><span>Pending Fine</span><strong>₹ {{ "%.2f"|format(unpaid_amount) }}</strong></div>
+    </div>
+</div>
+
+<div class="card">
+    <h3>Violation History</h3>
+    <div class="table-wrap">
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Violation</th>
+                <th>Location</th>
+                <th>Date</th>
+                <th>Fine (₹)</th>
+                <th>Status</th>
+                <th>Challan</th>
+            </tr>
+            {% for v in violations %}
+            <tr>
+                <td>{{ v.violation_id }}</td>
+                <td>{{ v.violation_name }}</td>
+                <td>{{ v.location }}</td>
+                <td>{{ v.violation_date }}</td>
+                <td>{{ "%.2f"|format(v.fine_amount) }}</td>
+                <td>
+                    {% if v.payment_status == 'Paid' %}
+                        <span class="badge badge-paid">Paid</span>
+                    {% else %}
+                        <span class="badge badge-unpaid">Unpaid</span>
+                    {% endif %}
+                </td>
+                <td><a href="/challan/{{ v.violation_id }}">View</a></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="7">No violations for this vehicle.</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+    <a href="/history" class="btn btn-grey mt-10">Back to History</a>
+</div>
+{% endblock %}

@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Dashboard</h1>
+
+<!-- Row 1: counts -->
+<div class="stats-grid">
+    <div class="stat-card stat-blue">
+        <h3>Registered Vehicles</h3>
+        <div class="number">{{ stats.total_vehicles }}</div>
+    </div>
+    <div class="stat-card stat-orange">
+        <h3>Total Violations</h3>
+        <div class="number">{{ stats.total_violations }}</div>
+    </div>
+    <div class="stat-card stat-green">
+        <h3>Paid Fines</h3>
+        <div class="number">{{ stats.paid }}</div>
+    </div>
+    <div class="stat-card stat-red">
+        <h3>Unpaid Fines</h3>
+        <div class="number">{{ stats.unpaid }}</div>
+    </div>
+</div>
+
+<!-- Row 2: money -->
+<div class="stats-grid">
+    <div class="stat-card stat-green">
+        <h3>Amount Collected</h3>
+        <div class="number">₹ {{ "%.2f"|format(stats.paid_amount) }}</div>
+    </div>
+    <div class="stat-card stat-red">
+        <h3>Amount Pending</h3>
+        <div class="number">₹ {{ "%.2f"|format(stats.unpaid_amount) }}</div>
+    </div>
+</div>
+
+<!-- Monthly statistics -->
+<div class="card">
+    <h3>Monthly Violation Statistics</h3>
+    {% for m in monthly %}
+    <div class="bar-row">
+        <span class="bar-label">{{ m.month }}</span>
+        <div class="bar-track">
+            <div class="bar-fill" style="width: {{ (m.total / max_total * 100)|round|int }}%;"></div>
+        </div>
+        <span class="bar-value">{{ m.total }}</span>
+    </div>
+    {% else %}
+    <p>No violations recorded yet.</p>
+    {% endfor %}
+</div>
+
+<!-- Violation type statistics -->
+<div class="card">
+    <h3>Violations by Type</h3>
+    <div class="table-wrap">
+        <table>
+            <tr>
+                <th>Violation</th>
+                <th>Total</th>
+            </tr>
+            {% for t in type_stats %}
+            <tr>
+                <td>{{ t.violation_name }}</td>
+                <td>{{ t.total }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="2">No data yet.</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
+<!-- Recent violations -->
+<div class="card">
+    <h3>Recent Violations</h3>
+    <div class="table-wrap">
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Vehicle No.</th>
+                <th>Violation</th>
+                <th>Location</th>
+                <th>Date</th>
+                <th>Fine (₹)</th>
+                <th>Status</th>
+                <th>Challan</th>
+            </tr>
+            {% for v in recent %}
+            <tr>
+                <td>{{ v.violation_id }}</td>
+                <td><a href="/vehicle/{{ v.vehicle_id }}">{{ v.vehicle_number }}</a></td>
+                <td>{{ v.violation_name }}</td>
+                <td>{{ v.location }}</td>
+                <td>{{ v.violation_date }}</td>
+                <td>{{ "%.2f"|format(v.fine_amount) }}</td>
+                <td>
+                    {% if v.payment_status == 'Paid' %}
+                        <span class="badge badge-paid">Paid</span>
+                    {% else %}
+                        <span class="badge badge-unpaid">Unpaid</span>
+                    {% endif %}
+                </td>
+                <td><a href="/challan/{{ v.violation_id }}">View</a></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="8">No violations recorded yet.</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+{% endblock %}
